@@ -9,6 +9,7 @@ use App\Actions\Fortify\UpdateUserProfileInformation;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -55,7 +56,7 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         ResetPassword::toMailUsing(function ($notifiable, $token) {
-            $url = 'http://localhost:5500/reset-password?token=' . $token . '&email=' . $notifiable->getEmailForPasswordReset();
+            $url = env('AUTH_FRONTEND_URL', 'http://localhost:5173').'/reset-password?token='.$token.'&email='.$notifiable->getEmailForPasswordReset();
 
             return (new MailMessage)
                 ->subject('Reset Your Tea Bound Password')
