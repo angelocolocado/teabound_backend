@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\Menu\CategoryController;
+use App\Http\Controllers\Menu\MenuController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -10,23 +12,26 @@ Route::get('/user', function (Request $request) {
 
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
 
-        /*
-         * Inventory Operations Endpoints
-         */
-        Route::apiResource('inventory', InventoryController::class);
-        Route::put('inventory/{inventory}/adjust-stock', [InventoryController::class, 'updateStock']);
+    /*
+     * Inventory Operations Endpoints
+     */
+    Route::apiResource('inventories', InventoryController::class);
+    Route::put('inventories/{inventory}/adjust-stock', [InventoryController::class, 'updateStock']);
 
-        /*
-         * Category Operations Endpoints
-         */
+    /*
+     * Category Operations Endpoints
+     */
 
-        Route::apiResource('category', \App\Http\Controllers\Menu\CategoryController::class);
+    Route::apiResource('categories', CategoryController::class);
 
-        /*
-        * Category Operations Endpoints
-        */
+    /*
+    * Menu Operations Endpoints
+    */
 
-        Route::apiResource('menu', \App\Http\Controllers\Menu\MenuController::class);
-
+    Route::apiResource('menus', MenuController::class);
+    Route::put('menus/{menu}/publish', [MenuController::class, 'publish']);
+    Route::put('menus/{menu}/deactivate', [MenuController::class, 'deactivate']);
+    Route::put('menus/{menu}/flag-pulled-out', [MenuController::class, 'markPulledOut']);
+    Route::put('menus/{menu}/mark-out-of-stock', [MenuController::class, 'markOutOfStock']);
 
 });

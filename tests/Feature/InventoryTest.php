@@ -23,7 +23,7 @@ test('Authenticated users can list inventory stocks.', function () {
         'stock_in_pcs' => 20,
     ]);
 
-    \Pest\Laravel\actingAs($user)->getJson('api/v1/inventory')
+    \Pest\Laravel\actingAs($user)->getJson('api/v1/inventories')
         ->assertOk()
         ->assertJsonCount(2)
         ->assertJsonPath('0.name', 'Tea Leaves')
@@ -40,7 +40,7 @@ test('Authenticated users can view an inventory stock.', function () {
         'stock_in_pcs' => 10,
     ]);
 
-    \Pest\Laravel\actingAs($user)->getJson("api/v1/inventory/$inventory->id")
+    \Pest\Laravel\actingAs($user)->getJson("api/v1/inventories/$inventory->id")
         ->assertOk()
         ->assertJsonPath('id', $inventory->id)
         ->assertJsonPath('name', 'Tea Leaves')
@@ -64,10 +64,10 @@ test('Only admin can update inventory details.', function () {
         'type' => 15,
     ];
 
-    \Pest\Laravel\actingAs($cashierUser)->putJson("api/v1/inventory/$inventory->id", $payload)
+    \Pest\Laravel\actingAs($cashierUser)->putJson("api/v1/inventories/$inventory->id", $payload)
         ->assertForbidden();
 
-    \Pest\Laravel\actingAs($adminUser)->putJson("api/v1/inventory/$inventory->id", $payload)
+    \Pest\Laravel\actingAs($adminUser)->putJson("api/v1/inventories/$inventory->id", $payload)
         ->assertOk();
 
     \Pest\Laravel\assertDatabaseHas('inventories', [
@@ -89,11 +89,11 @@ test('Only admin can adjust inventory stock.', function () {
         'stock_in_pcs' => 10,
     ]);
 
-    \Pest\Laravel\actingAs($cashierUser)->putJson("api/v1/inventory/$inventory->id/adjust-stock", [
+    \Pest\Laravel\actingAs($cashierUser)->putJson("api/v1/inventories/$inventory->id/adjust-stock", [
         'stock_in_pcs' => 25,
     ])->assertForbidden();
 
-    \Pest\Laravel\actingAs($adminUser)->putJson("api/v1/inventory/$inventory->id/adjust-stock", [
+    \Pest\Laravel\actingAs($adminUser)->putJson("api/v1/inventories/$inventory->id/adjust-stock", [
         'stock_in_pcs' => 25,
     ])->assertOk();
 
@@ -113,7 +113,7 @@ test('Adjusting inventory stock rejects negative quantities.', function () {
         'stock_in_pcs' => 10,
     ]);
 
-    \Pest\Laravel\actingAs($adminUser)->putJson("api/v1/inventory/$inventory->id/adjust-stock", [
+    \Pest\Laravel\actingAs($adminUser)->putJson("api/v1/inventories/$inventory->id/adjust-stock", [
         'stock_in_pcs' => -1,
     ])->assertUnprocessable()
         ->assertJsonValidationErrors('stock_in_pcs');
@@ -135,13 +135,13 @@ test('Only admin can create inventory stocks. Unauthenticated and Cashier is not
         'stock_in_pcs' => 10,
     ];
 
-    \Pest\Laravel\actingAs($adminUser)->postJson('api/v1/inventory', $payload)
+    \Pest\Laravel\actingAs($adminUser)->postJson('api/v1/inventories', $payload)
         ->assertCreated();
 
-    \Pest\Laravel\actingAs($cashierUser)->postJson('api/v1/inventory', $payload)
+    \Pest\Laravel\actingAs($cashierUser)->postJson('api/v1/inventories', $payload)
         ->assertForbidden();
 
-    $this->postJson('api/v1/inventory', $payload)
+    $this->postJson('api/v1/inventories', $payload)
         ->assertForbidden();
 });
 
@@ -158,15 +158,15 @@ test('Only admin can delete inventory stocks. Unauthenticated and Cashier is not
 
     $inventoryData = Inventory::create($payload);
 
-    \Pest\Laravel\actingAs($cashierUser)->delete("api/v1/inventory/$inventoryData->id")
+    \Pest\Laravel\actingAs($cashierUser)->delete("api/v1/inventories/$inventoryData->id")
         ->assertForbidden();
 
-    $this->delete("api/v1/inventory/$inventoryData->id")
+    $this->delete("api/v1/inventories/$inventoryData->id")
         ->assertForbidden();
 
     \Pest\Laravel\assertDatabaseHas('inventories', $payload);
 
-    \Pest\Laravel\actingAs($adminUser)->delete("api/v1/inventory/$inventoryData->id")
+    \Pest\Laravel\actingAs($adminUser)->delete("api/v1/inventories/$inventoryData->id")
         ->assertOk();
 
     \Pest\Laravel\assertDatabaseMissing('inventories', $payload);

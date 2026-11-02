@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Menu;
 
+use App\Enum\MenuStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Menu\MenuPatchRequest;
 use App\Http\Requests\Menu\MenuPostRequest;
 use App\Http\Resources\Menu\MenuResource;
 use App\Models\Menu;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class MenuController extends Controller
@@ -66,6 +66,62 @@ class MenuController extends Controller
         Gate::authorize('delete', $menu);
 
         $menu->delete();
+
+        return response()->noContent();
+    }
+
+    /**
+     * Mark the menu as available / active
+     */
+    public function publish(Menu $menu)
+    {
+        Gate::authorize('update', $menu);
+
+        $menu->update([
+            'status' => MenuStatusEnum::active,
+        ]);
+
+        return response()->noContent();
+    }
+
+    /**
+     * Mark the menu as deactivated / inactive
+     */
+    public function deactivate(Menu $menu)
+    {
+        Gate::authorize('update', $menu);
+
+        $menu->update([
+            'status' => MenuStatusEnum::inactive,
+        ]);
+
+        return response()->noContent();
+    }
+
+    /**
+     * Mark the menu as pulled-out
+     */
+    public function markPulledOut(Menu $menu)
+    {
+        Gate::authorize('update', $menu);
+
+        $menu->update([
+            'status' => MenuStatusEnum::pulled_out,
+        ]);
+
+        return response()->noContent();
+    }
+
+    /**
+     * Manually mark the menu as out of stock
+     */
+    public function markOutOfStock(Menu $menu)
+    {
+        Gate::authorize('update', $menu);
+
+        $menu->update([
+            'status' => MenuStatusEnum::out_of_stock,
+        ]);
 
         return response()->noContent();
     }
