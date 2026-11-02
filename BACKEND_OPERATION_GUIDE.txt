@@ -1,0 +1,379 @@
+TEABOUND BACKEND - SIMPLE OPERATION GUIDE
+
+All API requests use:
+  /api/v1
+
+All endpoints require an authenticated Sanctum user unless stated otherwise.
+
+
+1. LOGIN
+
+Log in using the application's configured authentication flow.
+
+Use the returned authenticated session for all API requests.
+
+
+2. CREATE A CATEGORY
+
+Endpoint:
+  POST /api/v1/categories
+
+Request body:
+  {
+    "name": "Milk Tea"
+  }
+
+Only an admin can create categories.
+
+
+3. CREATE AN INVENTORY ITEM
+
+Endpoint:
+  POST /api/v1/inventories
+
+Request body:
+  {
+    "name": "Tea Leaves",
+    "type": 5,
+    "stock_in_pcs": 100
+  }
+
+  case ingredients = 5;
+  case supplies = 10;
+  case products = 15;
+
+Only an admin can create inventory items.
+
+Save the returned inventory ID. It will be used when assigning inventory
+requirements to menu options.
+
+
+4. CREATE A MENU PRODUCT
+
+Endpoint:
+  POST /api/v1/menus
+
+Request body:
+  {
+    "category_id": 1,
+    "name": "Classic Milk Tea",
+    "notes": "Regular milk tea"
+  }
+
+Only an admin can create menu products.
+
+Save the returned menu ID.
+
+
+5. CREATE A MENU OPTION
+
+Menu options represent the sellable item choices, such as sizes, toppings,
+combos, or add-ons. The price belongs to the menu option.
+
+Endpoint:
+  POST /api/v1/menus/{menu_id}/options
+
+Request body:
+  {
+    "name": "Large",
+    "type": "size",
+    "price": 25,
+    "is_active": true,
+    "sort_order": 1
+  }
+
+Supported option types:
+  size
+  topping
+  combo
+  addon
+
+Only an admin can create menu options.
+
+Save the returned menu option ID. The cashier uses this ID when creating
+an order.
+
+
+6. ASSIGN INVENTORY TO THE MENU OPTION
+
+This tells the system which inventory items must be deducted when the
+menu option is sold.
+
+Endpoint:
+  POST /api/v1/menus/{menu_id}/options/{menu_option_id}/contents
+
+Request body:
+  {
+    "inventory_id": 1,
+    "name": "Tea Leaves",
+    "stock_to_deduct_in_pcs": 2
+  }
+
+Only an admin can assign menu-option inventory requirements.
+
+Repeat this step for every ingredient or supply used by the option.
+
+
+7. PUBLISH THE MENU
+
+Endpoint:
+  PUT /api/v1/menus/{menu_id}/publish
+
+No request body is required.
+
+The menu can now be displayed by the cashier interface.
+
+
+8. CREATE A DISCOUNT COUPON
+
+Endpoint:
+  POST /api/v1/coupons
+
+Percentage discount example:
+  {
+    "code": "SAVE10",
+    "type": "percentage",
+    "value": 10,
+    "minimum_purchase": 100,
+    "discount_cap": 50,
+    "expires_at": "2026-12-31 23:59:59",
+    "is_active": true
+  }
+
+Fixed discount example:
+  {
+    "code": "LESS20",
+    "type": "fixed",
+    "value": 20,
+    "minimum_purchase": 100,
+    "is_active": true
+  }
+
+Only an admin can create, edit, or delete coupons.
+
+
+9. DISPLAY THE CASHIER MENU
+
+List menus:
+  GET /api/v1/menus
+
+View one menu:
+  GET /api/v1/menus/{menu_id}
+
+List menu options:
+  GET /api/v1/menus/{menu_id}/options
+
+The response includes the product, available options, option prices, and
+configured inventory contents.
+
+
+10. CALCULATE AN ORDER
+
+Endpoint:
+  POST /api/v1/orders/calculate
+
+Request body:
+  {
+    "intent": "calculate",
+    "discount_code": "SAVE10",
+    "items": [
+      {
+        "product_option_id": 1,
+        "quantity": 2
+      }
+    ]
+  }
+
+The response contains:
+  subtotal
+  discount
+  total
+
+The frontend can show these values before checkout.
+
+
+11. CHECK OUT A CASH ORDER
+
+Endpoint:
+  POST /api/v1/orders/checkout
+
+Request body:
+  {
+    "intent": "check-out",
+    "payment_method": "cash",
+    "items": [
+      {
+        "product_option_id": 1,
+        "quantity": 2
+      }
+    ]
+  }
+
+Optional discount:
+  "discount_code": "SAVE10"
+
+Checkout automatically:
+  - validates the selected menu options;
+  - validates the discount code;
+  - calculates the total;
+  - deducts inventory;
+  - creates the order;
+  - creates order items;
+  - creates a completed payment record.
+
+If inventory is insufficient or the discount code is invalid, checkout
+stops and returns HTTP 422.
+
+IMPORTANT:
+The current backend does not yet accept cash_received or return change.
+The frontend cannot rely on a backend change value until that API field is
+implemented.
+
+
+12. CHECK OUT A GCASH ORDER
+
+Endpoint:
+  POST /api/v1/orders/checkout
+
+Request body:
+  {
+    "intent": "check-out",
+    "payment_method": "gcash",
+    "gcash_reference_number": "GCASH-12345",
+    "gcash_customer_number": "09171234567",
+    "items": [
+      {
+        "product_option_id": 1,
+        "quantity": 1
+      }
+    ]
+  }
+
+gcash_reference_number is required.
+gcash_customer_number is optional.
+
+
+13. VIEW ORDERS
+
+All orders:
+  GET /api/v1/orders?status=all
+
+Preparing orders:
+  GET /api/v1/orders?status=preparing
+
+Ready orders:
+  GET /api/v1/orders?status=ready
+
+Claimed orders:
+  GET /api/v1/orders?status=claimed
+
+
+14. UPDATE ORDER STATUS
+
+Endpoint:
+  PUT /api/v1/orders/{order_id}/status
+
+Request body:
+  {
+    "status": "ready"
+  }
+
+Allowed statuses:
+  preparing
+  ready
+  claimed
+
+
+15. VOID AN ORDER
+
+Endpoint:
+  POST /api/v1/orders/{order_id}/void
+
+Request body:
+  {
+    "reason": "customer_request"
+  }
+
+Allowed reasons:
+  customer_request
+  payment_issue
+  incorrect_order
+  unavailable_item
+  other
+
+Only an admin can void an order.
+
+Voiding restores the inventory deducted by the order and keeps the
+payment record for audit purposes.
+
+
+16. UPDATE INVENTORY STOCK
+
+Endpoint:
+  PUT /api/v1/inventories/{inventory_id}/adjust-stock
+
+Request body:
+  {
+    "stock_in_pcs": 120
+  }
+
+Only an admin can adjust inventory stock.
+
+
+17. VIEW PAYMENT RECORDS
+
+Endpoint:
+  GET /api/v1/payment-records
+
+Optional filters:
+  /api/v1/payment-records?payment_method=cash
+  /api/v1/payment-records?payment_method=gcash
+  /api/v1/payment-records?status=completed
+  /api/v1/payment-records?gcash_reference_number=GCASH-12345
+  /api/v1/payment-records?from=2026-11-01&to=2026-11-30
+
+
+18. VIEW SALES REPORTS
+
+Endpoint:
+  GET /api/v1/orders/sales-report
+
+Period filters:
+  /api/v1/orders/sales-report?period=daily
+  /api/v1/orders/sales-report?period=weekly
+  /api/v1/orders/sales-report?period=monthly
+
+Custom date filters:
+  /api/v1/orders/sales-report?from=2026-11-01&to=2026-11-30
+
+Payment filter:
+  /api/v1/orders/sales-report?payment_method=gcash
+
+The response includes:
+  - sales totals;
+  - revenue totals;
+  - discounts;
+  - top-selling menu items;
+  - popular sizes;
+  - popular toppings;
+  - peak ordering hours.
+
+The frontend can use this response to create charts and dashboards.
+
+
+19. FRONTEND-OWNED FEATURES
+
+The backend already returns the data needed for:
+  - displaying menu products and options;
+  - displaying order status queues;
+  - displaying inventory quantities;
+  - displaying sales and payment analytics;
+  - calculating the current order total.
+
+The frontend still needs to build:
+  - the cashier/POS screens;
+  - order editing screens;
+  - order cancellation user flow;
+  - low-stock notifications based on inventory values;
+  - visual charts and dashboards.
+
