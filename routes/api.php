@@ -22,5 +22,11 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
 
         Route::apiResource('category', \App\Http\Controllers\Menu\CategoryController::class);
 
+        /*
+        * Category Operations Endpoints
+        */
+
+        Route::apiResource('menu', \App\Http\Controllers\Menu\MenuController::class);
+
 
 });

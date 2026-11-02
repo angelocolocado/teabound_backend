@@ -35,7 +35,7 @@ class CategoryPutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'min:2', Rule::unique('categories', 'name')->ignore($this->user)]
+            'name' => ['required', 'min:2', Rule::unique('categories', 'name')->ignore($this->route('category'))]
         ];
     }
 }
