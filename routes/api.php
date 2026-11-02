@@ -4,6 +4,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\Menu\CategoryController;
 use App\Http\Controllers\Menu\MenuContentsController;
 use App\Http\Controllers\Menu\MenuController;
+use App\Http\Controllers\Menu\MenuOptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -39,4 +40,10 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     Route::post('menus/{menu}/contents', [MenuContentsController::class, 'addMenuContent']);
     Route::delete('menus/menu-contents/{menu_content}', [MenuContentsController::class, 'destroyMenuContent']);
     Route::put('menus/menu-contents/{menu_content}', [MenuContentsController::class, 'patchMenuContent']);
+
+    Route::get('menus/{menu}/options', [MenuOptionController::class, 'index']);
+    Route::post('menus/{menu}/options', [MenuOptionController::class, 'store']);
+    Route::get('menu-options/{menu_option}', [MenuOptionController::class, 'show']);
+    Route::put('menu-options/{menu_option}', [MenuOptionController::class, 'update']);
+    Route::delete('menu-options/{menu_option}', [MenuOptionController::class, 'destroy']);
 });

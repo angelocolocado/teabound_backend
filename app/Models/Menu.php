@@ -24,4 +24,9 @@ class Menu extends Model
     {
         return $this->hasMany(MenuContent::class, 'menu_id');
     }
+
+    public function menuOptions(): HasMany
+    {
+        return $this->hasMany(MenuOption::class, 'menu_id');
+    }
 }

@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('menu_contents', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Menu::class, 'menu_id')->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(Inventory::class, 'inventory_id')->constrained()->nullOnDelete();
+            $table->foreignIdFor(Inventory::class, 'inventory_id')->constrained();
             $table->string('name');
             $table->integer('stock_to_deduct_in_pcs')->default(1);
             $table->timestamps();

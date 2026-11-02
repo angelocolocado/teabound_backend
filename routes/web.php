@@ -7,10 +7,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/reset-password/{token}', function (Request $request, string $token) {
+
+Route::get('/hello', function (){
     return response()->json([
-        'message' => 'Here are the token.',
-        'token' => $token,
-        'email' => $request->query('email'),
+        "message" => "Hello from Laravel!",
+        "data" => [
+            "message" => "this is inside the data."
+        ]
     ]);
-})->name('password.reset');
+});

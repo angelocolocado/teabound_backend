@@ -19,7 +19,7 @@ class MenuController extends Controller
     {
         Gate::authorize('view-any', Menu::class);
 
-        $data = MenuResource::collection(Menu::with('category')->get());
+        $data = MenuResource::collection(Menu::with(['category', 'menuOptions'])->get());
 
         return response()->json($data);
     }
@@ -43,7 +43,7 @@ class MenuController extends Controller
     {
         Gate::authorize('view', $menu);
 
-        return response()->json(new MenuResource($menu->load('category')));
+        return response()->json(new MenuResource($menu->load(['category', 'menuOptions'])));
     }
 
     /**

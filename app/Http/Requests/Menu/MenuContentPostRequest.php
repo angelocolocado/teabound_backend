@@ -26,7 +26,7 @@ class MenuContentPostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'menu_id' => ['required', 'integer', Rule::exists('menus', 'id')],
+            'menu_id' => ['sometimes', 'integer', Rule::exists('menus', 'id')],
             'inventory_id' => ['required', 'integer',
                 Rule::exists('inventories', 'id'),
                 Rule::unique('menu_contents', 'inventory_id')->where(function ($query) {
