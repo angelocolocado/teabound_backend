@@ -18,10 +18,10 @@ class MenuPostRequest extends FormRequest
         return Gate::allows('create', Menu::class);
     }
 
-    public function prepareForValidation() : void
+    public function prepareForValidation(): void
     {
         $this->merge([
-           'name' => str($this->name)->lower()->trim()
+            'name' => str($this->name)->lower()->trim(),
         ]);
     }
 
@@ -36,7 +36,6 @@ class MenuPostRequest extends FormRequest
             'category_id' => ['required', 'integer', Rule::exists('categories', 'id')],
             'name' => ['required', 'min:2', 'max:150', Rule::unique('menus', 'name')],
             'notes' => ['sometimes', 'string', 'min:2', 'max:255'],
-            'price' => ['required', 'numeric', 'min:0']
         ];
     }
 }

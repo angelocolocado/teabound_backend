@@ -15,6 +15,7 @@ class MenuPatchRequest extends FormRequest
     public function authorize(): bool
     {
         $menu = $this->route('menu');
+
         return Gate::allows('update', $menu);
     }
 
@@ -29,7 +30,6 @@ class MenuPatchRequest extends FormRequest
             'category_id' => ['required', 'integer', Rule::exists('categories', 'id')],
             'name' => ['required', 'min:2', 'max:150', Rule::unique('menus', 'name')->ignore($this->route('menu'))],
             'notes' => ['sometimes', 'string', 'min:2', 'max:255'],
-            'price' => ['required', 'numeric', 'min:0']
         ];
     }
 }

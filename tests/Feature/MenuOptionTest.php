@@ -27,7 +27,6 @@ function menuForOptions(): Menu
     return Menu::create([
         'category_id' => $category->id,
         'name' => 'classic milk tea',
-        'price' => 100,
     ]);
 }
 

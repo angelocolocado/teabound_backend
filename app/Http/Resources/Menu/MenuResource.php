@@ -21,7 +21,6 @@ class MenuResource extends JsonResource
             'category' => $this->whenLoaded('category', function () {
                 return str($this->category->name)->title();
             }),
-            'price' => $this->price,
             'notes' => $this?->notes,
             'status' => $this->status?->name ?? MenuStatusEnum::inactive->name,
             'menu_contents' => MenuContentResource::collection($this->whenLoaded('menuContents')),

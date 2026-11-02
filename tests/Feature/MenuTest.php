@@ -15,7 +15,6 @@ function menuPayload(Category $category, string $name = 'milk tea'): array
         'category_id' => $category->id,
         'name' => $name,
         'notes' => 'House blend',
-        'price' => 120.50,
     ];
 }
 
@@ -66,7 +65,6 @@ test('menu creation rejects an unknown category.', function () {
     \Pest\Laravel\actingAs($admin)->postJson('api/v1/menus', [
         'category_id' => 999,
         'name' => 'Milk Tea',
-        'price' => 120,
     ])->assertUnprocessable()
         ->assertJsonValidationErrors('category_id');
 });
