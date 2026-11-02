@@ -23,7 +23,6 @@ class MenuResource extends JsonResource
             }),
             'notes' => $this?->notes,
             'status' => $this->status?->name ?? MenuStatusEnum::inactive->name,
-            'menu_contents' => MenuContentResource::collection($this->whenLoaded('menuContents')),
             'menu_options' => MenuOptionResource::collection($this->whenLoaded('menuOptions')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exceptions\InsufficientInventoryException;
 use App\Models\Inventory;
 use App\Models\MenuOption;
+use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -67,6 +68,7 @@ class InventoryService
                         ($requiredByInventory[$content->inventory_id] ?? 0)
                         + ($content->stock_to_deduct_in_pcs * $quantity);
                 }
+
             }
 
             $inventories = Inventory::query()
@@ -98,6 +100,32 @@ class InventoryService
             }
 
             return ['deducted' => $requiredByInventory];
+        });
+    }
+
+    public static function restoreInventory(Order $order): void
+    {
+        DB::transaction(function () use ($order): void {
+            $requirements = [];
+            $order->loadMissing('items.menuOption.menuContents');
+
+            foreach ($order->items as $item) {
+                foreach ($item->menuOption->menuContents as $content) {
+                    $requirements[$content->inventory_id] =
+                        ($requirements[$content->inventory_id] ?? 0)
+                        + ($content->stock_to_deduct_in_pcs * $item->quantity);
+                }
+            }
+
+            $inventories = Inventory::query()
+                ->whereIn('id', array_keys($requirements))
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+
+            foreach ($requirements as $inventoryId => $quantity) {
+                $inventories->get($inventoryId)?->increment('stock_in_pcs', $quantity);
+            }
         });
     }
 }

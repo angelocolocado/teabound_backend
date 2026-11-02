@@ -13,6 +13,16 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->string('order_number')->unique();
+            $table->string('status')->default('preparing')->index();
+            $table->decimal('subtotal', 10, 2);
+            $table->decimal('discount_amount', 10, 2)->default(0);
+            $table->decimal('total', 10, 2);
+            $table->unsignedBigInteger('coupon_id')->nullable()->index();
+            $table->string('coupon_code')->nullable();
+            $table->string('void_reason')->nullable();
+            $table->timestamp('voided_at')->nullable();
+            $table->unsignedBigInteger('voided_by')->nullable()->index();
             $table->timestamps();
         });
     }

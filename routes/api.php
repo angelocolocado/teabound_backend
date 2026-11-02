@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CouponController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\Menu\CategoryController;
 use App\Http\Controllers\Menu\MenuContentsController;
@@ -51,4 +52,11 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
 
     Route::post('orders/calculate', [OrderController::class, 'calculate']);
     Route::post('orders/checkout', [OrderController::class, 'checkout']);
+    Route::get('orders', [OrderController::class, 'index']);
+    Route::put('orders/{order}/status', [OrderController::class, 'updateStatus']);
+    Route::post('orders/{order}/void', [OrderController::class, 'void']);
+    Route::get('orders/sales-report', [OrderController::class, 'salesReport']);
+    Route::get('payment-records', [OrderController::class, 'paymentRecords']);
+
+    Route::apiResource('coupons', CouponController::class);
 });
