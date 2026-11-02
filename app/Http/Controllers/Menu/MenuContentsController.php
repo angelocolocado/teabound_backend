@@ -5,45 +5,56 @@ namespace App\Http\Controllers\Menu;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Menu\MenuContentPatchRequest;
 use App\Http\Requests\Menu\MenuContentPostRequest;
-use App\Http\Resources\Menu\MenuResource;
+use App\Http\Resources\Menu\MenuContentResource;
 use App\Models\Menu;
 use App\Models\MenuContent;
+use App\Models\MenuOption;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
 class MenuContentsController extends Controller
 {
-    public function getMenuContentsOfMenu(Menu $menu)
+    /**
+     * List the inventory contents required by a menu option.
+     */
+    public function index(Menu $menu, MenuOption $menuOption): JsonResponse
     {
-        Gate::authorize('view-any', MenuContent::class);
+        Gate::authorize('viewAny', MenuContent::class);
 
-        $data = $menu->load(['menuContents.inventory', 'category']);
-
-        return response()->json(new MenuResource($data));
+        return response()->json(MenuContentResource::collection(
+            $menuOption->menuContents()->with('inventory')->get()
+        ));
     }
 
-    public function addMenuContent(MenuContentPostRequest $request, Menu $menu)
+    /**
+     * Add an inventory content requirement to a menu option.
+     */
+    public function store(MenuContentPostRequest $request, Menu $menu, MenuOption $menuOption): JsonResponse
     {
-        $incomingFields = $request->validated();
+        $data = $menuOption->menuContents()->create($request->validated());
 
-        $data = $menu->menuContents()->create($incomingFields);
-
-        return response()->json($data, 201);
+        return response()->json(new MenuContentResource($data->load('inventory')), 201);
     }
 
-    public function patchMenuContent(MenuContentPatchRequest $request, MenuContent $menu_content)
+    /**
+     * Update an inventory content requirement.
+     */
+    public function update(MenuContentPatchRequest $request, MenuContent $menuContent): Response
     {
-        $incomingFields = $request->validated();
-
-        $menu_content->update($incomingFields);
+        $menuContent->update($request->validated());
 
         return response()->noContent();
     }
 
-    public function destroyMenuContent(MenuContent $menu_content)
+    /**
+     * Remove an inventory content requirement.
+     */
+    public function destroy(MenuContent $menuContent): Response
     {
-        Gate::authorize('delete', $menu_content);
+        Gate::authorize('delete', $menuContent);
 
-        $menu_content->delete();
+        $menuContent->delete();
 
         return response()->noContent();
     }

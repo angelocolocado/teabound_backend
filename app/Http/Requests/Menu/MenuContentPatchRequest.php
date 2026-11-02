@@ -31,7 +31,7 @@ class MenuContentPatchRequest extends FormRequest
                 Rule::exists('inventories', 'id'),
                 Rule::unique('menu_contents', 'inventory_id')
                     ->where(function ($query) {
-                        return $query->where('menu_id', $this->menu_id);
+                        return $query->where('menu_option_id', $this->route('menu_content')->menu_option_id);
                     })
                     ->ignore($this->route('menu_content'))],
             'name' => ['sometimes', 'max:100'],

@@ -17,7 +17,8 @@ class MenuContentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => str($this?->name)->title() ?? "No Title",
+            'menu_option_id' => $this->menu_option_id,
+            'name' => str($this?->name)->title() ?? 'No Title',
             'stock_to_deduct_in_pcs' => $this->stock_to_deduct_in_pcs,
             'inventory' => new InventoryResource($this->whenLoaded('inventory')),
             'created_at' => $this->created_at,

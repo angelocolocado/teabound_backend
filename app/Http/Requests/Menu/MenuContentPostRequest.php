@@ -26,11 +26,10 @@ class MenuContentPostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'menu_id' => ['sometimes', 'integer', Rule::exists('menus', 'id')],
             'inventory_id' => ['required', 'integer',
                 Rule::exists('inventories', 'id'),
                 Rule::unique('menu_contents', 'inventory_id')->where(function ($query) {
-                    return $query->where('menu_id', $this->menu_id);
+                    return $query->where('menu_option_id', $this->route('menu_option')->id);
                 })],
             'name' => ['required', 'string'],
             'stock_to_deduct_in_pcs' => ['sometimes', 'integer', 'min:1'],

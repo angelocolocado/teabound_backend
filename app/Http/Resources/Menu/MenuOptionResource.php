@@ -22,6 +22,7 @@ class MenuOptionResource extends JsonResource
             'price' => $this->price,
             'is_active' => $this->is_active,
             'sort_order' => $this->sort_order,
+            'menu_contents' => MenuContentResource::collection($this->whenLoaded('menuContents')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

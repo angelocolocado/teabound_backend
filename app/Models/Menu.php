@@ -20,11 +20,6 @@ class Menu extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function menuContents(): HasMany
-    {
-        return $this->hasMany(MenuContent::class, 'menu_id');
-    }
-
     public function menuOptions(): HasMany
     {
         return $this->hasMany(MenuOption::class, 'menu_id');
