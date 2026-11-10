@@ -46,7 +46,9 @@ return [
     /*
      * OpenAPI version of the resulting document.
      */
-    'openapi_version' => \Dedoc\Scramble\OpenApiVersion::V3_1,
+    'api_version' => class_exists(\Dedoc\Scramble\OpenApiVersion::class)
+        ? \Dedoc\Scramble\OpenApiVersion::V3_1
+        : '3.1.0',
 
     'info' => [
         'title' => 'Tea Bound POS API Documentation',
