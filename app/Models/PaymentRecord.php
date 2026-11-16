@@ -16,6 +16,8 @@ class PaymentRecord extends Model
         'gcash_customer_number',
         'gcash_reference_number',
         'amount',
+        'cash_received',
+        'change_amount',
         'recorded_by',
     ];
 
@@ -23,6 +25,8 @@ class PaymentRecord extends Model
         'payment_method' => PaymentTypeEnum::class,
         'status' => PaymentStatusEnum::class,
         'amount' => 'decimal:2',
+        'cash_received' => 'decimal:2',
+        'change_amount' => 'decimal:2',
     ];
 
     public function order(): BelongsTo

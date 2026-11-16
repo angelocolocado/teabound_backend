@@ -36,6 +36,7 @@ class OrderPostRequest extends FormRequest
             ],
             'gcash_customer_number' => ['sometimes', 'nullable', 'string', 'max:100'],
             'gcash_account_number' => ['sometimes', 'nullable', 'string', 'max:100'],
+            'cash_received' => ['sometimes', 'nullable', 'numeric', 'min:0'],
             'discount_code' => ['sometimes', 'nullable', 'string', 'max:50'],
             'items' => ['required', 'array'],
             'items.*.product_option_id' => ['required', 'integer', Rule::exists('menu_options', 'id')],

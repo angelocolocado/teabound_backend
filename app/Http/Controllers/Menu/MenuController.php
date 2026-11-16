@@ -8,7 +8,9 @@ use App\Http\Requests\Menu\MenuPatchRequest;
 use App\Http\Requests\Menu\MenuPostRequest;
 use App\Http\Resources\Menu\MenuResource;
 use App\Models\Menu;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
@@ -74,6 +76,25 @@ class MenuController extends Controller
         $menu->delete();
 
         return response()->noContent();
+    }
+
+    public function uploadImage(Request $request, Menu $menu)
+    {
+        Gate::authorize('update', $menu);
+
+        $request->validate([
+            'image' => ['required', 'image', 'max:5120'],
+        ]);
+
+        if ($menu->image_path !== null) {
+            Storage::disk('public')->delete($menu->image_path);
+        }
+
+        $menu->update([
+            'image_path' => $request->file('image')->store('menu-images', 'public'),
+        ]);
+
+        return response()->json(new MenuResource($menu->refresh()));
     }
 
     /**

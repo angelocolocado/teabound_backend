@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\OrderPostRequest;
 use App\Http\Requests\Order\OrderStatusRequest;
 use App\Http\Requests\Order\OrderVoidRequest;
+use App\Models\AuditLog;
 use App\Models\Order;
 use App\Models\PaymentRecord;
 use App\Services\CheckoutService;
@@ -46,6 +47,11 @@ class OrderController extends Controller
                 $checkout = CheckoutService::calculateStrict($data['items']);
                 $discount = CouponService::apply($data['discount_code'] ?? null, $checkout['subtotal']);
                 $total = round($checkout['subtotal'] - $discount['discount'], 2);
+                $cashReceived = isset($data['cash_received']) ? round((float) $data['cash_received'], 2) : null;
+
+                if ($data['payment_method'] === 'cash' && $cashReceived !== null && $cashReceived < $total) {
+                    throw new InvalidArgumentException('cash_received must be at least the order total.');
+                }
 
                 InventoryService::deductInventory($data['items']);
 
@@ -80,7 +86,18 @@ class OrderController extends Controller
                         ?? null,
                     'gcash_reference_number' => $data['gcash_reference_number'] ?? null,
                     'amount' => $total,
+                    'cash_received' => $cashReceived,
+                    'change_amount' => $cashReceived === null ? null : round($cashReceived - $total, 2),
                     'recorded_by' => auth()->id(),
+                ]);
+
+                AuditLog::create([
+                    'user_id' => auth()->id(),
+                    'action' => 'order.checkout',
+                    'description' => 'Order '.$order->order_number.' was checked out.',
+                    'auditable_type' => Order::class,
+                    'auditable_id' => $order->id,
+                    'metadata' => ['payment_method' => $data['payment_method'], 'total' => $total],
                 ]);
 
                 return $order->load(['items', 'paymentRecord']);
@@ -136,6 +153,14 @@ class OrderController extends Controller
                 'void_reason' => $request->validated()['reason'],
                 'voided_at' => now(),
                 'voided_by' => auth()->id(),
+            ]);
+            AuditLog::create([
+                'user_id' => auth()->id(),
+                'action' => 'order.void',
+                'description' => 'Order '.$order->order_number.' was voided.',
+                'auditable_type' => Order::class,
+                'auditable_id' => $order->id,
+                'metadata' => ['reason' => $request->validated()['reason']],
             ]);
         });
 

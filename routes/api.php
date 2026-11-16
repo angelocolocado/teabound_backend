@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\Menu\CategoryController;
@@ -19,6 +20,7 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     /*
      * Inventory Operations Endpoints
      */
+    Route::get('inventories/low-stock', [InventoryController::class, 'lowStock']);
     Route::apiResource('inventories', InventoryController::class);
     Route::put('inventories/{inventory}/adjust-stock', [InventoryController::class, 'updateStock']);
 
@@ -33,6 +35,7 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     */
 
     Route::apiResource('menus', MenuController::class);
+    Route::post('menus/{menu}/image', [MenuController::class, 'uploadImage']);
     Route::put('menus/{menu}/publish', [MenuController::class, 'publish']);
     Route::put('menus/{menu}/deactivate', [MenuController::class, 'deactivate']);
     Route::put('menus/{menu}/flag-pulled-out', [MenuController::class, 'markPulledOut']);
@@ -57,6 +60,8 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     Route::post('orders/{order}/void', [OrderController::class, 'void']);
     Route::get('orders/sales-report', [OrderController::class, 'salesReport']);
     Route::get('payment-records', [OrderController::class, 'paymentRecords']);
+    Route::get('login-history', [ActivityController::class, 'loginHistory']);
+    Route::get('audit-activity', [ActivityController::class, 'auditActivity']);
 
     Route::apiResource('coupons', CouponController::class);
 });

@@ -20,6 +20,8 @@ class InventoryResource extends JsonResource
             'type' => $this->type->name,
             'type_code' => $this->type->value,
             'stock_in_pcs' => $this->stock_in_pcs,
+            'low_stock_threshold' => $this->low_stock_threshold,
+            'display_unit' => $this->display_unit,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

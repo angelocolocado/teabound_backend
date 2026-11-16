@@ -28,6 +28,8 @@ class InventoryUpdateRequest extends FormRequest
             'name' => ['sometimes', 'min:2', 'max:100', 'string'],
             'type' => ['sometimes', Rule::enum(InventoryTypeEnum::class)],
             // 'stock_in_pcs' => ['sometimes', 'integer', 'min:0'] SHOULD NOT UPDATE ALONG WITH THEM, The stock_in_pcs have its own dedicated endpoint.
+            'low_stock_threshold' => ['sometimes', 'integer', 'min:0'],
+            'display_unit' => ['sometimes', 'string', 'max:30'],
         ];
     }
 }

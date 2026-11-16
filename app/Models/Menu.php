@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Menu extends Model
 {
-    protected $fillable = ['category_id', 'name', 'notes', 'status'];
+    protected $fillable = ['category_id', 'name', 'notes', 'status', 'image_path'];
 
     protected $casts = [
         'status' => MenuStatusEnum::class,

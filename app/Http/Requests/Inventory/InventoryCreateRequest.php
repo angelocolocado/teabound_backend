@@ -28,6 +28,8 @@ class InventoryCreateRequest extends FormRequest
             'name' => ['required', 'min:2', 'max:100', 'string'],
             'type' => ['required', Rule::enum(InventoryTypeEnum::class)],
             'stock_in_pcs' => ['required', 'integer', 'min:0'],
+            'low_stock_threshold' => ['sometimes', 'integer', 'min:0'],
+            'display_unit' => ['sometimes', 'string', 'max:30'],
         ];
     }
 }

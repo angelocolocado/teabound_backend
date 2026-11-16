@@ -5,6 +5,7 @@ namespace App\Http\Resources\Menu;
 use App\Enum\MenuStatusEnum;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class MenuResource extends JsonResource
 {
@@ -22,6 +23,7 @@ class MenuResource extends JsonResource
                 return str($this->category->name)->title();
             }),
             'notes' => $this?->notes,
+            'image_url' => $this->image_path ? Storage::disk('public')->url($this->image_path) : null,
             'status' => $this->status?->name ?? MenuStatusEnum::inactive->name,
             'menu_options' => MenuOptionResource::collection($this->whenLoaded('menuOptions')),
             'created_at' => $this->created_at,

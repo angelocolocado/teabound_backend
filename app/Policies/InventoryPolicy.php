@@ -13,7 +13,7 @@ class InventoryPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return in_array($user->role, [UserRoleEnum::admin, UserRoleEnum::cashier], true);
     }
 
     /**
@@ -21,7 +21,7 @@ class InventoryPolicy
      */
     public function view(User $user, Inventory $inventory): bool
     {
-        return false;
+        return $this->viewAny($user);
     }
 
     /**
